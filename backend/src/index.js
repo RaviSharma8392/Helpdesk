@@ -20,7 +20,7 @@ app.use('/api', routes);
 // connect server
 const connectServer = async () => {
   try {
-     
+     console.log(ServerConfig.PORT);
     app.listen(ServerConfig.PORT, async () =>
     {
       await DbConfig.connectDataBase();
