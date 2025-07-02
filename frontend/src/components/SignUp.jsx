@@ -25,7 +25,7 @@ const SignUP = ({ setIndex }) => {
       console.log("Submitting signup data:", data);
 
       const response = await axios.post(
-        "http://localhost:3000/api/v1/auth/signUp",
+        "https://helpdesk-n4di.onrender.com/api/v1/auth/signUp",
         data
       );
 
