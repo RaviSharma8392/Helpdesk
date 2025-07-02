@@ -7,7 +7,7 @@ const routes = require('../src/routes');
 const app = express();
 
 app.use(cors({
-  origin: "https://helpdeskassign.netlify.app/", 
+  origin: "http://localhost:5173", 
   credentials: true, 
 }));
 
