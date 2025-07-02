@@ -1,36 +1,36 @@
 const express = require('express');
-const cors = require('cors'); // ✅ Import CORS
+const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const { ServerConfig, DbConfig } = require('./config');
 const routes = require('../src/routes');
 
 const app = express();
 
+// ✅ CORS setup
 app.use(cors({
-  origin: "https://helpdeskassign.netlify.app", 
-  credentials: true, 
+  origin: "https://helpdeskassign.netlify.app", // Frontend origin
+  credentials: true, // Allow cookies, headers, etc.
 }));
 
+// ✅ Middleware
 app.use(cookieParser());
-app.use(express.json());
+app.use(express.json()); // Parse JSON body
 
+// ✅ API routes
 app.use('/api', routes);
 
-
-// connect server
+// ✅ Start server & connect DB
 const connectServer = async () => {
   try {
-     console.log(ServerConfig.PORT);
+    console.log("Starting server on port:", ServerConfig.PORT);
 
-  
-    app.listen(ServerConfig.PORT, async () =>
-    {
+    app.listen(ServerConfig.PORT, async () => {
       await DbConfig.connectDataBase();
-      console.log(`Server running at http://localhost:${ServerConfig.PORT}`)
-    }
-    );  
+      console.log(`🚀 Server running at http://localhost:${ServerConfig.PORT}`);
+    });
+
   } catch (error) {
-    console.log(" Error starting server:", error);
+    console.error("❌ Error starting server:", error.message);
   }
 };
 

@@ -6,10 +6,14 @@ import { useAuth } from "../hooks/auth";
 const Login = ({ setIndex }) => {
   const navigate = useNavigate();
   const { login } = useAuth();
+
   const [loginData, setLoginData] = useState({
     userName: "",
     password: "",
   });
+
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,29 +25,43 @@ const Login = ({ setIndex }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(loginData);
+    setErrorMsg("");
+    setLoading(true);
 
     try {
       const response = await axios.post(
         "https://helpdesk-n4di.onrender.com/api/v1/auth/signIn",
         loginData
       );
-      login(response.data);
-      console.log("Login successful:", response.data.role);
-      if (response.data.role === "admin") {
-        navigate("/admin");
-      } else if (response.data.role === "user") {
-        navigate("/user");
-      } else if (response.data.role === "technicalSupport") {
-        navigate("/technicalsupport");
-      } else if (response.data.role === "operationTeam") {
-        navigate("/operation");
-      }
 
-      // Save token to localStorage/cookies or redirect if needed
+      login(response.data);
+
+      const role = response.data.role;
+      console.log("Login successful:", role);
+
+      switch (role) {
+        case "admin":
+          navigate("/admin");
+          break;
+        case "user":
+          navigate("/user");
+          break;
+        case "technicalSupport":
+          navigate("/technicalsupport");
+          break;
+        case "operationTeam":
+          navigate("/operation");
+          break;
+        default:
+          setErrorMsg("Unknown user role.");
+      }
     } catch (error) {
-      console.error("Login failed:", error.response?.data || error.message);
-      alert("Invalid credentials or server error.");
+      const message =
+        error.response?.data?.message || "Invalid credentials or server error.";
+      setErrorMsg(message);
+      console.error("Login failed:", message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,7 +70,12 @@ const Login = ({ setIndex }) => {
       <h1 className="py-5 text-[20px] lg:text-[48px] font-bold italic text-center font-['Roboto']">
         Helpdesk System
       </h1>
-      <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+
+      {errorMsg && (
+        <p className="text-red-500 text-center font-medium">{errorMsg}</p>
+      )}
+
+      <form className="flex flex-col gap-5 mt-5" onSubmit={handleSubmit}>
         <input
           type="text"
           name="userName"
@@ -71,17 +94,26 @@ const Login = ({ setIndex }) => {
           required
           className="py-[5px] px-2 border bg-white"
         />
+
         <div className="flex justify-center">
           <button
             type="submit"
-            className="bg-[#03CC17] text-white px-15 py-2 rounded-2xl">
-            Sign In
+            disabled={loading}
+            className={`bg-[#03CC17] text-white px-10 py-2 rounded-2xl transition duration-300 ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}>
+            {loading ? "Signing In..." : "Sign In"}
           </button>
         </div>
       </form>
+
       <div className="flex justify-between my-3.5">
-        <button className="text-red-400">Forgot password</button>
-        <button onClick={() => setIndex(1)}>Sign Up</button>
+        <button className="text-red-400" disabled={loading}>
+          Forgot password
+        </button>
+        <button onClick={() => setIndex(1)} disabled={loading}>
+          Sign Up
+        </button>
       </div>
     </div>
   );
