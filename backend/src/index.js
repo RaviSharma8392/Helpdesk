@@ -21,6 +21,8 @@ app.use('/api', routes);
 const connectServer = async () => {
   try {
      console.log(ServerConfig.PORT);
+
+     console.log(ServerConfig.JWTSecret);
     app.listen(ServerConfig.PORT, async () =>
     {
       await DbConfig.connectDataBase();
